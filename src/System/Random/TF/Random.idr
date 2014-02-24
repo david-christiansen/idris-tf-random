@@ -1,5 +1,7 @@
 module System.Random.TF.Random
 
+%default total
+
 -- | A somewhat anemic RandomGen class
 class RandomGen r where
   next : r -> (Bits32, r)
@@ -46,7 +48,7 @@ randomBits32' k =
    loop rng =
       let (x, rng') = next rng in
       let x'        = x `prim__andB32` mask in
-      if x' <= k then (x', rng') else loop rng'
+      if x' <= k then (x', rng') else assert_total $ loop rng'
 
 makeBits64 : Bits32 -> Bits32 -> Bits64
 makeBits64 w1 w2 = (prim__shlB64 (prim__zextB32_B64 w1) 32) `prim__orB64` (prim__zextB32_B64 w2)
@@ -85,7 +87,7 @@ randomBits64' k =
     let x = makeBits64 (prim__andB32 x1 mask) x2 in
     if x <= k
       then (x, rng'')
-      else loop rng''
+      else assert_total $ loop rng''
 
 
 randomBits32 : RandomGen g => (Bits32, Bits32) -> g -> (Bits32, g)
