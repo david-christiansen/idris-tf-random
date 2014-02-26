@@ -7,6 +7,7 @@ class RandomGen r where
   next : r -> (Bits32, r)
   split : r -> (r, r)
 
+
 class Random a where
   randomR : RandomGen g => (a,a) -> g -> (a,g)
 
@@ -112,8 +113,12 @@ instance Random Bits64 where
 
 
 instance Random Int where
-  randomR (l, h) rng =
-    mapFst prim__truncB64_Int $ randomR (prim__truncInt_B64 l, prim__truncInt_B64 h) rng
+  randomR (l, h) rng = if h < l
+                          then assert_total $ randomR (h, l) rng
+                          else let d = h - l in
+                               mapFst ((l+) . prim__zextB32_Int) $
+                               randomR (the Bits32 0, prim__truncInt_B32 d) rng
+
   random rng = mapFst prim__truncB64_Int $ random rng
 
 instance Random Bool where

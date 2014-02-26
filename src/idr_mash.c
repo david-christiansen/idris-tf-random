@@ -38,7 +38,12 @@ uint64_t get_d (struct idr_block256 *blk) {
 }
 
 struct idr_block256 *alloc_block () {
-  return (struct idr_block256 *) (malloc (sizeof(struct idr_block256)));
+  struct idr_block256 *blk = (struct idr_block256 *) (malloc (sizeof(struct idr_block256)));
+  set_a(blk, 0LL);
+  set_b(blk, 0LL);
+  set_c(blk, 0LL);
+  set_d(blk, 0LL);
+  return blk;
 }
 
 void free_block (struct idr_block256 *blk) {

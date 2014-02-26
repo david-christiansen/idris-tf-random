@@ -162,12 +162,12 @@ tfGenNext' gen =
 
 tfGenSplit : TFGen -> (TFGen, TFGen)
 tfGenSplit (MkTFGen k i b bi x y) =
-  let bi' = bi + 1 in
-  let k' = mash' (MkTFGen k i b bi x y) 0 0 in
-  let b'' = setBit64 b (prim__zextB16_B64 bi) in
   if bi == 64
-    then (makeTFGen k' 0 0 1, makeTFGen k' 0 1 1)
-    else (makeTFGen k i b bi', makeTFGen k i b'' bi')
+    then let k' = mash' (MkTFGen k i b bi x y) 0 0 in
+         (makeTFGen k' 0 0 1, makeTFGen k' 0 1 1)
+    else let bi' = bi + 1 in
+         let b' = setBit64 b (prim__zextB16_B64 bi) in
+         (makeTFGen k i b bi', makeTFGen k i b' bi')
 
 
 seedTFGen : Block256 -> TFGen
@@ -178,3 +178,7 @@ mkSeed : IO Block256
 mkSeed =  do seed <- mkForeign (FFun "seed_block" [] FPtr)
              eatBlock seed
 
+
+instance RandomGen TFGen where
+  next = tfGenNext
+  split = tfGenSplit
