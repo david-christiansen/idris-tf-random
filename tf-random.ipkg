@@ -2,7 +2,7 @@ package tfrandom
 
 sourcedir = src
 
-objs = threefish_block.o, threefish_block.h, idr_mash.o, idr_mash.h, threefish.h, threefish_port.h, brg_types.h
+objs = threefish_block.o, threefish_block.so, threefish_block.h, idr_mash.o, idr_mash.so, idr_mash.h, threefish.h, threefish_port.h, brg_types.h
 
 modules = System.Random.TF.Gen, System.Random.TF.Random
 
