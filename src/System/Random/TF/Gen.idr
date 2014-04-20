@@ -9,6 +9,8 @@ import System.Random.TF.Random
 %link C "threefish_block.o"
 %link C "idr_mash.o"
 
+%dynamic "threefish_block.so"
+%dynamic "idr_mash.so"
 
 data Block256 = MkBlock256 Bits64 Bits64 Bits64 Bits64
 %name Block256 blk,blk'
@@ -17,12 +19,46 @@ instance Show Block256 where
   show (MkBlock256 a b c d) = show a ++ "|" ++ show b ++ "|" ++
                               show c ++ "|" ++ show d
 
+data BlockIndex =
+  Zero | One | Two | Three | Four | Five | Six | Seven
+
+instance Show BlockIndex where
+  show Zero  = "0"
+  show One   = "1"
+  show Two   = "2"
+  show Three = "3"
+  show Four  = "4"
+  show Five  = "5"
+  show Six   = "6"
+  show Seven = "7"
+
+instance Cast BlockIndex Nat where
+  cast Zero  = 0
+  cast One   = 1
+  cast Two   = 2
+  cast Three = 3
+  cast Four  = 4
+  cast Five  = 5
+  cast Six   = 6
+  cast Seven = 7
+
+instance Cast BlockIndex Bits64 where
+  cast Zero  = 0
+  cast One   = 1
+  cast Two   = 2
+  cast Three = 3
+  cast Four  = 4
+  cast Five  = 5
+  cast Six   = 6
+  cast Seven = 7
+
+
 record TFGen : Type where
   MkTFGen : (tfgen_key : Block256) ->
             (tfgen_level : Bits64) ->
             (tfgen_position : Bits64) ->
             (tfgen_treeposindex : Bits16) ->
-            (tfgen_blockindex : Fin 8) ->
+            (tfgen_blockindex : BlockIndex) ->
             (tfgen_block : Block256) ->
             TFGen
 %name TFGen gen,gen'
@@ -37,7 +73,7 @@ record TFGenR : Type where
              (tfgenr_level : Bits64) ->
              (tfgenr_position : Bits64) ->
              (tfgenr_treeposindex : Bits16) ->
-             (tfgenr_blockindex : Fin 8) ->
+             (tfgenr_blockindex : BlockIndex) ->
              TFGenR
 %name TFGenR gen, gen'
 
@@ -104,32 +140,36 @@ higher x = prim__truncB64_B32 $ prim__lshrB64 x 32
 lower : Bits64 -> Bits32
 lower x = prim__truncB64_B32 x
 
-extract : Block256 -> Fin 8 -> Bits32
-extract (MkBlock256 a b c d)                                 fZ         = higher a
-extract (MkBlock256 a b c d)                             (fS fZ)        = lower a
-extract (MkBlock256 a b c d)                         (fS (fS fZ))       = higher b
-extract (MkBlock256 a b c d)                     (fS (fS (fS fZ)))      = lower b
-extract (MkBlock256 a b c d)                 (fS (fS (fS (fS fZ))))     = higher c
-extract (MkBlock256 a b c d)             (fS (fS (fS (fS (fS fZ)))))    = lower c
-extract (MkBlock256 a b c d)         (fS (fS (fS (fS (fS (fS fZ))))))   = higher d
-extract (MkBlock256 a b c d)     (fS (fS (fS (fS (fS (fS (fS fZ)))))))  = lower d
-extract (MkBlock256 a b c d) (fS (fS (fS (fS (fS (fS (fS (fS no)))))))) = absurd no
 
 
-inc : Fin n -> Maybe (Fin n)
-inc {n= Z} f = absurd f
-inc {n= (S Z)} fZ = Nothing
-inc {n= (S (S k))} fZ = Just 1
-inc {n= (S k)} (fS x) = map fS (inc x)
 
-incWrap : Fin n -> Fin n
-incWrap {n=Z}   f = absurd f
-incWrap {n=S n} f = maybe fZ id (inc f)
+extract : Block256 -> BlockIndex -> Bits32
+extract (MkBlock256 a b c d) Zero  = higher a
+extract (MkBlock256 a b c d) One   = lower a
+extract (MkBlock256 a b c d) Two   = higher b
+extract (MkBlock256 a b c d) Three = lower b
+extract (MkBlock256 a b c d) Four  = higher c
+extract (MkBlock256 a b c d) Five  = lower c
+extract (MkBlock256 a b c d) Six   = higher d
+extract (MkBlock256 a b c d) Seven = lower d
+
+
+
+inc : BlockIndex -> Maybe BlockIndex
+inc Zero  = Just One
+inc One   = Just Two
+inc Two   = Just Three
+inc Three = Just Four
+inc Four  = Just Five
+inc Five  = Just Six
+inc Six   = Just Seven
+inc Seven = Nothing
+
 
 
 
 makeTFGen : Block256 -> Bits64 -> Bits64 -> Bits16 -> TFGen
-makeTFGen k i b bi = MkTFGen k i b bi 0 (mash k i b 0 1)
+makeTFGen k i b bi = MkTFGen k i b bi Zero (mash k i b 0 1)
 
 setBit64 : Bits64 -> Bits64 -> Bits64
 setBit64 a i = prim__orB64 a (prim__shlB64 0x1 4)
@@ -182,3 +222,6 @@ mkSeed =  do seed <- mkForeign (FFun "seed_block" [] FPtr)
 instance RandomGen TFGen where
   next = tfGenNext
   split = tfGenSplit
+
+
+-- -}
