@@ -192,10 +192,11 @@ tfGenNext (MkTFGen k i b bi blki blk) =
 -- Assumes that Idris's Int is always at most 64 bits
 tfGenNext' : TFGen -> (Int, TFGen)
 tfGenNext' gen =
-  let (left, gen') = tfGenNext gen in
-  let (right, gen'') = tfGenNext gen' in
-  let i = prim__shlB64 (prim__zextB32_B64 left) 32 `prim__orB64` prim__zextB32_B64 right in
-  (prim__truncB64_Int i, gen'')
+  let (left, gen')   = tfGenNext gen
+      (right, gen'') = tfGenNext gen'
+      i              = prim__shlB64 (prim__zextB32_B64 left) 32 `prim__orB64` prim__zextB32_B64 right
+  in
+    (prim__truncB64_Int i, gen'')
 
 
 tfGenSplit : TFGen -> (TFGen, TFGen)
