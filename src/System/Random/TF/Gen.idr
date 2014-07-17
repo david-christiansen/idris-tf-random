@@ -178,18 +178,16 @@ setBit64 a i = prim__orB64 a (prim__shlB64 0x1 4)
 tfGenNext : TFGen -> (Bits32, TFGen)
 tfGenNext (MkTFGen k i b bi blki blk) =
    let next : TFGen =
-     case inc blki of
-       Nothing => if i < maxBound - 1
-                    then makeTFGen k (i+1) b bi
-                    else
-                      if bi < 64
-                        then makeTFGen k 0 (setBit64 b (prim__zextB16_B64 bi)) (bi+1)
-                        else makeTFGen (mash k maxBound b 0 0) 0 0 0
-       Just blki' => MkTFGen k (i+1) b bi blki' blk
+         case inc blki of
+           Nothing => if i < maxBound - 1
+                        then makeTFGen k (i+1) b bi
+                        else
+                          if bi < 64
+                            then makeTFGen k 0 (setBit64 b (prim__zextB16_B64 bi)) (bi+1)
+                            else makeTFGen (mash k maxBound b 0 0) 0 0 0
+           Just blki' => MkTFGen k (i+1) b bi blki' blk
+       val : Bits32 = extract blk blki
    in (val, next)
-
-  where val : Bits32
-        val = extract blk blki
 
 -- Assumes that Idris's Int is always at most 64 bits
 tfGenNext' : TFGen -> (Int, TFGen)
