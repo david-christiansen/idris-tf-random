@@ -9,6 +9,6 @@ threefish_block.so: threefish_block.c threefish_block.h
 idr_mash.o: idr_mash.c idr_mash.h
 	gcc -I. -c idr_mash.c
 
-idr_mash.so: idr_mash.c idr_mash.h
-	gcc -I. -fPIC -o idr_mash.so -shared idr_mash.c
+idr_mash.so: idr_mash.c idr_mash.h threefish_block.o
+	gcc -I. -fPIC -o idr_mash.so -shared idr_mash.c threefish_block.o
 
