@@ -118,15 +118,15 @@ instance Cast Bits16 Bits64 where
   cast = prim__zextB16_B64
 
 instance Cast (Fin 8) Bits64 where
-  cast                                 fZ        = 0
-  cast                             (fS fZ)       = 1
-  cast                         (fS (fS fZ))      = 2
-  cast                     (fS (fS (fS fZ)))     = 3
-  cast                 (fS (fS (fS (fS fZ))))    = 4
-  cast             (fS (fS (fS (fS (fS fZ)))))   = 5
-  cast         (fS (fS (fS (fS (fS (fS fZ))))))  = 6
-  cast     (fS (fS (fS (fS (fS (fS (fS fZ))))))) = 7
-  cast (fS (fS (fS (fS (fS (fS (fS (fS no)))))))) = absurd no
+  cast                                 FZ        = 0
+  cast                             (FS FZ)       = 1
+  cast                         (FS (FS FZ))      = 2
+  cast                     (FS (FS (FS FZ)))     = 3
+  cast                 (FS (FS (FS (FS FZ))))    = 4
+  cast             (FS (FS (FS (FS (FS FZ)))))   = 5
+  cast         (FS (FS (FS (FS (FS (FS FZ))))))  = 6
+  cast     (FS (FS (FS (FS (FS (FS (FS FZ))))))) = 7
+  cast (FS (FS (FS (FS (FS (FS (FS (FS no)))))))) = absurd no
 
 fromTFGenR : TFGenR -> Maybe TFGen
 fromTFGenR (MkTFGenR k i b bi blki) =
