@@ -133,7 +133,7 @@ implementation Cast (Fin 8) Bits64 where
 fromTFGenR : TFGenR -> Maybe TFGen
 fromTFGenR (MkTFGenR k i b bi blki) =
   if bi >= 0 && bi <= 64
-     then Just (MkTFGen k i b bi blki (mash k (i - cast blki) b 0 1))
+     then Just (MkTFGen k i b bi blki (mash k (i `prim__subB64` cast blki) b 0 1))
      else Nothing
 
 higher : Bits64 -> Bits32
@@ -181,7 +181,7 @@ tfGenNext : TFGen -> (Bits32, TFGen)
 tfGenNext (MkTFGen k i b bi blki blk) =
    let next : TFGen =
          case inc blki of
-           Nothing => if i < maxBound - 1
+           Nothing => if i < (maxBound `prim__subB64` 1)
                         then makeTFGen k (i+1) b bi
                         else
                           if bi < 64
