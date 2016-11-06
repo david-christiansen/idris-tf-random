@@ -3,11 +3,12 @@ module System.Random.TF.Random
 %default total
 
 -- | A somewhat anemic RandomGen interface
+public export
 interface RandomGen r where
   next : r -> (Bits32, r)
   split : r -> (r, r)
 
-
+public export
 interface Random a where
   randomR : RandomGen g => (a,a) -> g -> (a,g)
 
@@ -16,11 +17,21 @@ interface Random a where
 mapFst : (a -> c) -> (a, b) -> (c, b)
 mapFst g (x, y) = (g x, y)
 
-boundsWrap : (Ord a, Num a) => (a -> g -> (a, g)) -> (a, a) -> g -> (a, g)
-boundsWrap f (l, h) rng = if l == h
-                             then (l, rng)
-                             else if l > h then mapFst (h +) $ f (l - h) rng
-                                           else mapFst (l +) $ f (h - l) rng
+boundsWrap : (Ord a, Num a) => (subtract : a -> a -> a) ->
+             (a -> g -> (a, g)) -> (a, a) -> g -> (a, g)
+boundsWrap subtract f (l, h) rng
+  = case compare l h of
+         LT => mapFst (l +) $ f (subtract h l) rng
+         EQ => (l, rng)
+         GT => mapFst (h +) $ f (subtract l h) rng
+
+namespace Bits32
+  boundsWrap : (Bits32 -> g -> (Bits32, g)) -> (Bits32, Bits32) -> g -> (Bits32, g)
+  boundsWrap f bounds rng = boundsWrap prim__subB32 f bounds rng
+
+namespace Bits64
+  boundsWrap : (Bits64 -> g -> (Bits64, g)) -> (Bits64, Bits64) -> g -> (Bits64, g)
+  boundsWrap f bounds rng = boundsWrap prim__subB64 f bounds rng
 
 word32Mask : Bits32 -> Bits32
 word32Mask w =
