@@ -15,14 +15,14 @@ import System.Random.TF.Random
 data Block256 = MkBlock256 Bits64 Bits64 Bits64 Bits64
 %name Block256 blk,blk'
 
-instance Show Block256 where
+implementation Show Block256 where
   show (MkBlock256 a b c d) = show a ++ "|" ++ show b ++ "|" ++
                               show c ++ "|" ++ show d
 
 data BlockIndex =
   Zero | One | Two | Three | Four | Five | Six | Seven
 
-instance Show BlockIndex where
+implementation Show BlockIndex where
   show Zero  = "0"
   show One   = "1"
   show Two   = "2"
@@ -32,7 +32,7 @@ instance Show BlockIndex where
   show Six   = "6"
   show Seven = "7"
 
-instance Cast BlockIndex Nat where
+implementation Cast BlockIndex Nat where
   cast Zero  = 0
   cast One   = 1
   cast Two   = 2
@@ -42,7 +42,7 @@ instance Cast BlockIndex Nat where
   cast Six   = 6
   cast Seven = 7
 
-instance Cast BlockIndex Bits64 where
+implementation Cast BlockIndex Bits64 where
   cast Zero  = 0
   cast One   = 1
   cast Two   = 2
@@ -63,7 +63,7 @@ record TFGen : Type where
             TFGen
 %name TFGen gen,gen'
 
-instance Show TFGen where
+implementation Show TFGen where
   show (MkTFGen k lvl pos tpos blki blk) =
     "MkTFGen (" ++ show k ++ ") " ++ show lvl ++ " " ++ show pos ++ " " ++
     show tpos ++ " " ++ show (cast {to=Nat} blki) ++ " (" ++ show blk ++ ")"
@@ -114,10 +114,10 @@ mash' (MkTFGen k i b _ _ _) m o32 =
 toTFGenR : TFGen -> TFGenR
 toTFGenR (MkTFGen key lvl pos tpos bpos _) = MkTFGenR key lvl pos tpos bpos
 
-instance Cast Bits16 Bits64 where
+implementation Cast Bits16 Bits64 where
   cast = prim__zextB16_B64
 
-instance Cast (Fin 8) Bits64 where
+implementation Cast (Fin 8) Bits64 where
   cast                                 FZ        = 0
   cast                             (FS FZ)       = 1
   cast                         (FS (FS FZ))      = 2
@@ -218,7 +218,7 @@ mkSeed =  do seed <- mkForeign (FFun "seed_block" [] FPtr)
              eatBlock seed
 
 
-instance RandomGen TFGen where
+implementation RandomGen TFGen where
   next = tfGenNext
   split = tfGenSplit
 

@@ -101,18 +101,18 @@ randomBits64 (l, h) rng = boundsWrap randomBits64' (l, h) rng
 randomBounded : (RandomGen g, Random a, MinBound a, MaxBound a) => g -> (a, g)
 randomBounded = randomR (minBound, maxBound)
 
-instance Random Bits32 where
+implementation Random Bits32 where
   randomR = randomBits32
   random = next
 
-instance Random Bits64 where
+implementation Random Bits64 where
   randomR = randomBits64
   random rng = let (h, rng') = next rng in
                let (l, rng'') = next rng' in
                (makeBits64 h l, rng'')
 
 
-instance Random Int where
+implementation Random Int where
   randomR (l, h) rng = if h < l
                           then assert_total $ randomR (h, l) rng
                           else let d = h - l in
@@ -121,13 +121,13 @@ instance Random Int where
 
   random rng = mapFst prim__truncB64_Int $ random rng
 
-instance Random Bool where
+implementation Random Bool where
   randomR (b1, b2) rng = if b1 == b2
                            then (b1, snd (next rng))
                            else mapFst intToBool $ randomR (the Int 0, 1) rng
   random rng = mapFst intToBool $ randomR (the Int 0, 1) rng
 
-instance Random Char where
+implementation Random Char where
   randomR (l, h) rng = mapFst (cast {from=Int} {to=Char}) $
                        randomR (cast {to=Int} l, cast {to=Int} h) rng
   random rng = mapFst (cast {from=Int} {to=Char}) $
