@@ -12,3 +12,6 @@ idr_mash.o: idr_mash.c idr_mash.h
 idr_mash.so: idr_mash.c idr_mash.h threefish_block.o
 	gcc -I. -fPIC -o idr_mash.so -shared idr_mash.c threefish_block.o
 
+clean:
+	find . -name "*.o" -delete
+	find . -name "*.so" -delete
