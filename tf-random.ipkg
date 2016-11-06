@@ -2,8 +2,27 @@ package tfrandom
 
 sourcedir = src
 
-objs = threefish_block.o, threefish_block.so, threefish_block.h, idr_mash.o, idr_mash.so, idr_mash.h, threefish.h, threefish_port.h, brg_types.h
+objs = threefish_block.o
+     , threefish_block.so
+     , threefish_block.h
+     , idr_mash.o
+     , idr_mash.so
+     , idr_mash.h
+     , threefish.h
+     , threefish_port.h
+     , brg_types.h
 
-modules = System.Random.TF.Gen, System.Random.TF.Random
+modules = System.Random.TF.Gen
+        , System.Random.TF.Random
 
 makefile = Makefile
+
+brief = "A port of the Haskell tf-random to Idris."
+-- version =
+readme = README.md
+-- license =
+author = "David Christiansen"
+
+homepage = https://github.com/david-christiansen/idris-tf-random
+sourceloc = https://github.com/david-christiansen/idris-tf-random
+bugtracker = https://github.com/david-christiansen/idris-tf-random/issues
