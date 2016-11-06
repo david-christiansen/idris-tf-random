@@ -53,28 +53,30 @@ implementation Cast BlockIndex Bits64 where
   cast Seven = 7
 
 
-record TFGen : Type where
-  MkTFGen : (tfgen_key : Block256) ->
-            (tfgen_level : Bits64) ->
-            (tfgen_position : Bits64) ->
-            (tfgen_treeposindex : Bits16) ->
-            (tfgen_blockindex : BlockIndex) ->
-            (tfgen_block : Block256) ->
-            TFGen
-%name TFGen gen,gen'
+record TFGen where
+  constructor MkTFGen
+  tfgen_key : Block256
+  tfgen_level : Bits64
+  tfgen_position : Bits64
+  tfgen_treeposindex : Bits16
+  tfgen_blockindex : BlockIndex
+  tfgen_block : Block256
+
+%name TFGen gen, gen'
 
 implementation Show TFGen where
   show (MkTFGen k lvl pos tpos blki blk) =
     "MkTFGen (" ++ show k ++ ") " ++ show lvl ++ " " ++ show pos ++ " " ++
     show tpos ++ " " ++ show (cast {to=Nat} blki) ++ " (" ++ show blk ++ ")"
 
-record TFGenR : Type where
-  MkTFGenR : (tfgenr_key : Block256) ->
-             (tfgenr_level : Bits64) ->
-             (tfgenr_position : Bits64) ->
-             (tfgenr_treeposindex : Bits16) ->
-             (tfgenr_blockindex : BlockIndex) ->
-             TFGenR
+record TFGenR where
+  constructor MkTFGenR
+  tfgenr_key : Block256
+  tfgenr_level : Bits64
+  tfgenr_position : Bits64
+  tfgenr_treeposindex : Bits16
+  tfgenr_blockindex : BlockIndex
+
 %name TFGenR gen, gen'
 
 getCBlock : Block256 -> IO Ptr
