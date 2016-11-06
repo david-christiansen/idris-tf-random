@@ -2,13 +2,13 @@ module System.Random.TF.Random
 
 %default total
 
--- | A somewhat anemic RandomGen class
-class RandomGen r where
+-- | A somewhat anemic RandomGen interface
+interface RandomGen r where
   next : r -> (Bits32, r)
   split : r -> (r, r)
 
 
-class Random a where
+interface Random a where
   randomR : RandomGen g => (a,a) -> g -> (a,g)
 
   random  : RandomGen g => g -> (a, g)
