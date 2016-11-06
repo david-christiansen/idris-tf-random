@@ -82,29 +82,29 @@ record TFGenR where
 
 getCBlock : Block256 -> IO Ptr
 getCBlock (MkBlock256 a b c d) =
-  do blkPtr <- mkForeign (FFun "alloc_block" [] FPtr)
-     mkForeign (FFun "set_a" [FPtr, FBits64] FUnit) blkPtr a
-     mkForeign (FFun "set_b" [FPtr, FBits64] FUnit) blkPtr b
-     mkForeign (FFun "set_c" [FPtr, FBits64] FUnit) blkPtr c
-     mkForeign (FFun "set_d" [FPtr, FBits64] FUnit) blkPtr d
-     return blkPtr
+  do blkPtr <- foreign FFI_C "alloc_block" (IO Ptr)
+     foreign FFI_C "set_a" (Ptr -> Bits64 -> IO ()) blkPtr a
+     foreign FFI_C "set_b" (Ptr -> Bits64 -> IO ()) blkPtr b
+     foreign FFI_C "set_c" (Ptr -> Bits64 -> IO ()) blkPtr c
+     foreign FFI_C "set_d" (Ptr -> Bits64 -> IO ()) blkPtr d
+     pure blkPtr
 
 eatBlock : Ptr -> IO Block256
-eatBlock blk = do a <- mkForeign (FFun "get_a" [FPtr] FBits64) blk
-                  b <- mkForeign (FFun "get_b" [FPtr] FBits64) blk
-                  c <- mkForeign (FFun "get_c" [FPtr] FBits64) blk
-                  d <- mkForeign (FFun "get_d" [FPtr] FBits64) blk
-                  mkForeign (FFun "free_block" [FPtr] FUnit) blk
-                  return $ MkBlock256 a b c d
+eatBlock blk = do a <- foreign FFI_C "get_a" (Ptr -> IO Bits64) blk
+                  b <- foreign FFI_C "get_b" (Ptr -> IO Bits64) blk
+                  c <- foreign FFI_C "get_c" (Ptr -> IO Bits64) blk
+                  d <- foreign FFI_C "get_d" (Ptr -> IO Bits64) blk
+                  foreign FFI_C "free_block" (Ptr -> IO ()) blk
+                  pure $ MkBlock256 a b c d
 
 ioMash : Block256 -> Bits64 -> Bits64 -> Bits64 -> Int -> IO Block256
 ioMash k i b m o32 =
   do blk_k <- getCBlock k
      blk_c' <- getCBlock (MkBlock256 b i m 0)
-     blk_res <- mkForeign (FFun "alloc_block" [] FPtr)
-     mkForeign (FFun "idr_Threefish_256_Process_Block" [FPtr, FPtr, FPtr] FUnit) blk_k blk_c' blk_res
-     mkForeign (FFun "free_block" [FPtr] FUnit) blk_k
-     mkForeign (FFun "free_block" [FPtr] FUnit) blk_c'
+     blk_res <- foreign FFI_C "alloc_block" (IO Ptr)
+     foreign FFI_C "idr_Threefish_256_Process_Block" (Ptr -> Ptr -> Ptr -> IO ()) blk_k blk_c' blk_res
+     foreign FFI_C "free_block" (Ptr -> IO ()) blk_k
+     foreign FFI_C "free_block" (Ptr -> IO ()) blk_c'
      eatBlock blk_res
 
 mash : Block256 -> Bits64 -> Bits64 -> Bits64 -> Int -> Block256
@@ -217,7 +217,7 @@ seedTFGen blk = makeTFGen blk 0 0 0
 
 
 mkSeed : IO Block256
-mkSeed =  do seed <- mkForeign (FFun "seed_block" [] FPtr)
+mkSeed =  do seed <- foreign FFI_C "seed_block" (IO Ptr)
              eatBlock seed
 
 
