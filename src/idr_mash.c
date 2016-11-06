@@ -63,6 +63,8 @@ struct idr_block256 *seed_block () {
   return seed;
 }
 
+void Threefish_256_Process_Block(const u08b_t *, const u08b_t *, u08b_t *, int);
+
 void idr_Threefish_256_Process_Block(struct idr_block256 *key, struct idr_block256 *blk, struct idr_block256 *out) {
   uint64_t keyPtr[4];
   uint64_t blkPtr[4];
