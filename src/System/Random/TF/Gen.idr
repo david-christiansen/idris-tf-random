@@ -1,6 +1,7 @@
 module System.Random.TF.Gen
 
 import System.Random.TF.Random
+import Data.Vect
 
 %default total
 
