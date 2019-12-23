@@ -223,15 +223,18 @@ tfGenSplit (MkTFGen k i b bi x y) =
          (makeTFGen k i b bi', makeTFGen k i b' bi')
 
 
+export
 seedTFGen : Block256 -> TFGen
 seedTFGen blk = makeTFGen blk 0 0 0
 
 
+export
 mkSeed : IO Block256
 mkSeed =  do seed <- foreign FFI_C "seed_block" (IO Ptr)
              eatBlock seed
 
 
+export
 implementation RandomGen TFGen where
   next = tfGenNext
   split = tfGenSplit
