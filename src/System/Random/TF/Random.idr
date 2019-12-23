@@ -112,10 +112,12 @@ randomBits64 (l, h) rng = boundsWrap randomBits64' (l, h) rng
 randomBounded : (RandomGen g, Random a, MinBound a, MaxBound a) => g -> (a, g)
 randomBounded = randomR (minBound, maxBound)
 
+export
 implementation Random Bits32 where
   randomR = randomBits32
   random = next
 
+export
 implementation Random Bits64 where
   randomR = randomBits64
   random rng = let (h, rng') = next rng in
@@ -123,6 +125,7 @@ implementation Random Bits64 where
                (makeBits64 h l, rng'')
 
 
+export
 implementation Random Int where
   randomR (l, h) rng = if h < l
                           then assert_total $ randomR (h, l) rng
@@ -132,12 +135,14 @@ implementation Random Int where
 
   random rng = mapFst prim__truncB64_Int $ random rng
 
+export
 implementation Random Bool where
   randomR (b1, b2) rng = if b1 == b2
                            then (b1, snd (next rng))
                            else mapFst intToBool $ randomR (the Int 0, 1) rng
   random rng = mapFst intToBool $ randomR (the Int 0, 1) rng
 
+export
 implementation Random Char where
   randomR (l, h) rng = mapFst (cast {from=Int} {to=Char}) $
                        randomR (cast {to=Int} l, cast {to=Int} h) rng
