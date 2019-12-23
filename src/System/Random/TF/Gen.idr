@@ -13,16 +13,20 @@ import Data.Vect
 %dynamic "threefish_block.so"
 %dynamic "idr_mash.so"
 
+export
 data Block256 = MkBlock256 Bits64 Bits64 Bits64 Bits64
 %name Block256 blk,blk'
 
+export
 implementation Show Block256 where
   show (MkBlock256 a b c d) = show a ++ "|" ++ show b ++ "|" ++
                               show c ++ "|" ++ show d
 
+export
 data BlockIndex =
   Zero | One | Two | Three | Four | Five | Six | Seven
 
+export
 implementation Show BlockIndex where
   show Zero  = "0"
   show One   = "1"
@@ -33,6 +37,7 @@ implementation Show BlockIndex where
   show Six   = "6"
   show Seven = "7"
 
+export
 implementation Cast BlockIndex Nat where
   cast Zero  = 0
   cast One   = 1
@@ -43,6 +48,7 @@ implementation Cast BlockIndex Nat where
   cast Six   = 6
   cast Seven = 7
 
+export
 implementation Cast BlockIndex Bits64 where
   cast Zero  = 0
   cast One   = 1
@@ -54,6 +60,7 @@ implementation Cast BlockIndex Bits64 where
   cast Seven = 7
 
 
+export
 record TFGen where
   constructor MkTFGen
   tfgen_key : Block256
@@ -65,11 +72,13 @@ record TFGen where
 
 %name TFGen gen, gen'
 
+export
 implementation Show TFGen where
   show (MkTFGen k lvl pos tpos blki blk) =
     "MkTFGen (" ++ show k ++ ") " ++ show lvl ++ " " ++ show pos ++ " " ++
     show tpos ++ " " ++ show (cast {to=Nat} blki) ++ " (" ++ show blk ++ ")"
 
+export
 record TFGenR where
   constructor MkTFGenR
   tfgenr_key : Block256
@@ -117,9 +126,11 @@ mash' (MkTFGen k i b _ _ _) m o32 =
 toTFGenR : TFGen -> TFGenR
 toTFGenR (MkTFGen key lvl pos tpos bpos _) = MkTFGenR key lvl pos tpos bpos
 
+export
 implementation Cast Bits16 Bits64 where
   cast = prim__zextB16_B64
 
+export
 implementation Cast (Fin 8) Bits64 where
   cast                                 FZ        = 0
   cast                             (FS FZ)       = 1
