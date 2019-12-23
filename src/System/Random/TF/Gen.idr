@@ -13,7 +13,7 @@ import Data.Vect
 %dynamic "threefish_block.so"
 %dynamic "idr_mash.so"
 
-export
+public export
 data Block256 = MkBlock256 Bits64 Bits64 Bits64 Bits64
 %name Block256 blk,blk'
 
